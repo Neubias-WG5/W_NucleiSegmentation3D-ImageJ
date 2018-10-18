@@ -1,0 +1,83 @@
+{
+    "name": "Nuclei_Segmentation_3D_ImageJ",
+    "container-image": {
+        "image": "neubiaswg5/w_nuclei_segmentation_imagej",
+        "type": "singularity"
+    },
+    "schema-version": "cytomine-0.1",
+    "description": "3D nuclei segmentation using 3D gaussian blur thresholding and 3D watershed using MorpholibJ plugin",
+    "command-line": "python wrapper.py CYTOMINE_HOST CYTOMINE_PUBLIC_KEY CYTOMINE_PRIVATE_KEY CYTOMINE_ID_PROJECT CYTOMINE_ID_SOFTWARE",
+    "inputs": [
+        {
+            "id": "cytomine_host",
+            "value-key": "@ID",
+            "command-line-flag": "--@id",
+            "name": "Cytomine host",
+            "description": "Cytomine server hostname",
+            "type": "String",
+            "optional": false,
+            "set-by-server": true
+        },
+        {
+            "id": "cytomine_public_key",
+            "value-key": "@ID",
+            "command-line-flag": "--@id",
+            "name": "Cytomine public key",
+            "description": "Cytomine public key",
+            "type": "String",
+            "optional": false,
+            "set-by-server": true
+        },
+        {
+            "id": "cytomine_private_key",
+            "value-key": "@ID",
+            "command-line-flag": "--@id",
+            "name": "Cytomine private key",
+            "description": "Cytomine private key",
+            "type": "String",
+            "optional": false,
+            "set-by-server": true
+        },
+        {
+            "id": "cytomine_id_project",
+            "value-key": "@ID",
+            "command-line-flag": "--@id",
+            "name": "Cytomine project id",
+            "description": "Cytomine project id",
+            "type": "String",
+            "optional": false,
+            "set-by-server": true
+        },
+        {
+            "id": "cytomine_id_software",
+            "value-key": "@ID",
+            "command-line-flag": "--@id",
+            "name": "Cytomine software id",
+            "description": "Cytomine software id",
+            "type": "String",
+            "optional": false,
+            "set-by-server": true
+        },
+        {
+            "id": "ij_radius",
+            "value-key": "@ID",
+            "command-line-flag": "--@id",
+            "name": "Radius",
+            "description": "Radius for Gaussian smoothing",
+            "type": "Number",
+            "default-value": 4,
+            "optional": true
+        },
+        {
+            "id": "ij_min_threshold",
+            "value-key": "@ID",
+            "command-line-flag": "--@id",
+            "name": "Min Threshold",
+            "description": "Min Threshold ",
+            "type": "Number",
+            "default-value": 15,
+            "optional": true
+}
+        
+    ]
+}
