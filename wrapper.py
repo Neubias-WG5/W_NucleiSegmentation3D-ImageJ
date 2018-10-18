@@ -3,12 +3,12 @@ import sys
 from subprocess import call
 
 from cytomine import CytomineJob
-from cytomine.models import Annotation, Job, ImageGroupCollection, AnnotationCollection
+from cytomine.models import Annotation, Job, ImageInstance, ImageGroupCollection, ImageSequenceCollection, AnnotationCollection,  Property
 from shapely.affinity import affine_transform
 from skimage import io
 
 from annotation_exporter.mask_to_objects import mask_to_objects_3d
-from neubiaswg5.metrics.compute_metrics import computemetrics
+from neubiaswg5.metrics.compute_metrics import computemetrics_batch
 
 
 def main(argv):
@@ -59,45 +59,81 @@ def main(argv):
             err_desc = "Failed to execute the ImageJ macro (return code: {})".format(return_code)
             cj.job.update(progress=50, statusComment=err_desc)
             raise ValueError(err_desc)
-
-
+            
         # 4. Upload the annotation and labels to Cytomine (annotations are extracted from the mask using
-        # the AnnotationExporter module)
-        for image in cj.monitor(input_images, start=60, end=80, period=0.1, prefix="Extracting and uploading polygons from masks"):
-            file = "{}.tif".format(image.id)
+        # the AnnotationExporter module)    
+        for image_group in cj.monitor(input_images, start=60, end=80, period=0.1, prefix="Extracting and uploading polygons from masks"):
+            file = "{}.tif".format(image_group.id)
             path = os.path.join(out_path, file)
             data = io.imread(path)
 
             # extract objects
-            slices = mask_to_objects_3d(data,0, None, True, False)
+            objects = mask_to_objects_3d(data, background=0, assume_unique_labels=True)
 
-            print("Found {} polygons in this image {}.".format(len(slices), image.id))
+            print("Found {} polygons in this image group {}.".format(len(objects), image_group.id))
+
+            # create a structure mapping depth with image instance id
+            image_sequences = ImageSequenceCollection().fetch_with_filter("imagegroup", image_group.id)
+            depth_to_image = {iseq.zStack: iseq.image for iseq in image_sequences}
+            height = ImageInstance().fetch(image_sequences[0].image).height
+            
+            # upload
+            collection = AnnotationCollection()
+            for object_slices in objects:
+                for _slice in object_slices:
+                    # TODO check why depth overflows
+                    if _slice.depth not in depth_to_image:
+                        print("problem with depth")
+                        continue
+                    collection.append(Annotation(
+                        location=affine_transform(_slice.polygon, [1, 0, 0, -1, 0, height]).wkt,
+                        id_image=depth_to_image[_slice.depth], id_project=cj.parameters.cytomine_id_project, property=[
+                            {"key": "index", "value": str(_slice.label)}
+                        ]
+                    ))
+            collection.save()
+    
+            
+        ''' TODO WAIT FOR THE PYTHON API TO GET THE ID OF EACH IMAGE BY IMAGE GROUP
+        # 4. Upload the annotation and labels to Cytomine (annotations are extracted from the mask using
+        # the AnnotationExporter module)
+        for imageGroup in cj.monitor(input_images, start=60, end=80, period=0.1, prefix="Extracting and uploading polygons from masks"):
+            file = "{}.tif".format(imageGroup.id)
+            path = os.path.join(out_path, file)
+            data = io.imread(path)
+
+            # extract objects
+            objectList = mask_to_objects_3d(data,0, None, True, False)
+
+            print("Found {} polygons in this imageGroup {}.".format(len(objectList), imageGroup.id))
 
             # upload
             collection = AnnotationCollection()
-            for obj_slice in slices:
-                collection.append(Annotation(
-                    location=affine_transform(obj_slice.polygon, [1, 0, 0, -1, 0, image.height]).wkt,
-                    id_image=image.id, id_project=cj.parameters.cytomine_id_project, property=[
-                        {"key": "index", "value": str(obj_slice.label)}
-                    ]
-                ))
+            for slices in objectList:
+              for obj_slice in slices:
+                  collection.append(Annotation(
+                      location=affine_transform(obj_slice.polygon, [1, 0, 0, -1, 0, image.height]).wkt,
+                      id_image=image.id, id_project=cj.parameters.cytomine_id_project, property=[
+                          {"key": "index", "value": str(obj_slice.label)}
+                      ]
+                  ))
             collection.save()
+        '''
+        # 5. Compute and upload the metrics
+        cj.job.update(progress=80, statusComment="Computing and uploading metrics...")
+        outfiles, reffiles = zip(*[
+            (os.path.join(out_path, "{}.tif".format(image.id)),
+             os.path.join(gt_path, "{}.tif".format(image.id)))
+            for image in input_images
+        ])
+        results = computemetrics_batch(outfiles, reffiles, "ObjSeg", '/tmp')
+        for key, value in results.items():
+            Property(cj.job, key=key, value=str(value)).save()
+        Property(cj.job, key="IMAGE_INSTANCES", value=str([im.id for im in input_images])).save()
 
+        #Finished
         cj.job.update(status=Job.TERMINATED, progress=100, statusComment="Finished.")
-'''
-        # 5. Compute the metrics
-        cj.job.update(progress=80, statusComment="Computing metrics...")
-        for image in cj.monitor(input_images, start=80, end=98, period=0.1, prefix="computing metrics"):
-                afile = "{}.tif".format(image.id)
-                pathi = os.path.join(in_path, afile)
-                patho = os.path.join(out_path, afile)
-#            data = io.imread(path)
 
-                metrics,params=computemetrics(pathi,patho,"TreTrc",'/tmp')
-                print('metrics for '+pathi)
-                print(metrics)
-'''
         # TODO: compute metrics:
         # in /out: output files {id}.tiff
         # in /ground_truth: label files {id}.tiff
