@@ -1,7 +1,7 @@
 import os
 import sys
 from subprocess import call
-
+import numpy as np
 from cytomine import CytomineJob
 from cytomine.models import Annotation, Job, ImageInstance, ImageGroupCollection, ImageSequenceCollection, AnnotationCollection,  Property
 from shapely.affinity import affine_transform
@@ -51,8 +51,7 @@ def main(argv):
 
         # 3. Call the image analysis workflow using the run script
         cj.job.update(progress=25, statusComment="Launching workflow...")
-        command = "/usr/bin/xvfb-run java -Xmx6000m -cp /fiji/jars/ij.jar ij.ImageJ --headless --console " \
-"-macro macro.ijm \"input={}, output={}, radius={}, min_threshold={}\"".format(in_path, out_path, cj.parameters.ij_radius, cj.parameters.ij_min_threshold)
+        command = "/usr/bin/xvfb-run java -Xmx6000m -cp /fiji/jars/ij.jar ij.ImageJ --headless --console -macro macro.ijm \"input={}, output={}, radius={}, min_threshold={}\"".format(in_path, out_path, cj.parameters.ij_radius, cj.parameters.ij_min_threshold)
         return_code = call(command, shell=True, cwd="/fiji")  # waits for the subprocess to return
 
         if return_code != 0:
@@ -68,7 +67,7 @@ def main(argv):
             data = io.imread(path)
 
             # extract objects
-            objects = mask_to_objects_3d(data, background=0, assume_unique_labels=True)
+            objects = mask_to_objects_3d(np.moveaxis(data, 0, 2), background=0, assume_unique_labels=True)
 
             print("Found {} polygons in this image group {}.".format(len(objects), image_group.id))
 
@@ -92,33 +91,7 @@ def main(argv):
                         ]
                     ))
             collection.save()
-    
-            
-        ''' TODO WAIT FOR THE PYTHON API TO GET THE ID OF EACH IMAGE BY IMAGE GROUP
-        # 4. Upload the annotation and labels to Cytomine (annotations are extracted from the mask using
-        # the AnnotationExporter module)
-        for imageGroup in cj.monitor(input_images, start=60, end=80, period=0.1, prefix="Extracting and uploading polygons from masks"):
-            file = "{}.tif".format(imageGroup.id)
-            path = os.path.join(out_path, file)
-            data = io.imread(path)
 
-            # extract objects
-            objectList = mask_to_objects_3d(data,0, None, True, False)
-
-            print("Found {} polygons in this imageGroup {}.".format(len(objectList), imageGroup.id))
-
-            # upload
-            collection = AnnotationCollection()
-            for slices in objectList:
-              for obj_slice in slices:
-                  collection.append(Annotation(
-                      location=affine_transform(obj_slice.polygon, [1, 0, 0, -1, 0, image.height]).wkt,
-                      id_image=image.id, id_project=cj.parameters.cytomine_id_project, property=[
-                          {"key": "index", "value": str(obj_slice.label)}
-                      ]
-                  ))
-            collection.save()
-        '''
         # 5. Compute and upload the metrics
         cj.job.update(progress=80, statusComment="Computing and uploading metrics...")
         outfiles, reffiles = zip(*[
