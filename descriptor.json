@@ -1,7 +1,7 @@
 {
     "name": "Nuclei_Segmentation_3D_ImageJ",
     "container-image": {
-        "image": "neubiaswg5/w_nuclei_segmentation_imagej",
+        "image": "neubiaswg5/w_nucleisegmentation3d-imagej",
         "type": "singularity"
     },
     "schema-version": "cytomine-0.1",
