@@ -7,6 +7,7 @@ RUN cd /fiji/plugins && wget -O mcib3d_plugins3.92.jar http://imagejdocu.tudor.l
 ADD IJNuclei3DSegmentation.ijm /fiji/macros/macro.ijm
 
 ADD wrapper.py /app/wrapper.py
+ADD descriptor.json /app/descriptor.json
 
 ENTRYPOINT ["python", "/app/wrapper.py"]
 
