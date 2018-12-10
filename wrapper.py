@@ -4,7 +4,7 @@ from subprocess import call
 from cytomine.models import Job
 
 from neubiaswg5 import CLASS_OBJSEG
-from neubiaswg5.cytomine import NeubiasJob, prepare_data, upload_data, upload_metrics
+from neubiaswg5.helpers import NeubiasJob, prepare_data, upload_data, upload_metrics
 
 
 def main(argv):
