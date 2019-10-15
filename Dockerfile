@@ -6,9 +6,9 @@ RUN apt-get update && apt-get install openjdk-8-jdk -y && apt-get clean
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Install Cytomine python client
-RUN git clone https://github.com/cytomine-uliege/Cytomine-python-client.git
-RUN cd /Cytomine-python-client && git checkout tags/v2.3.0.poc.1 && pip install .
-RUN rm -r /Cytomine-python-client
+RUN git clone https://github.com/cytomine-uliege/Cytomine-python-client.git && \
+    cd /Cytomine-python-client && git checkout tags/v2.3.0.poc.1 && pip install . && \
+    rm -r /Cytomine-python-client
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Fiji installation
