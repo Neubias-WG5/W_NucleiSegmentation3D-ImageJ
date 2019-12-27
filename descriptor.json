@@ -6,7 +6,7 @@
     },
     "schema-version": "cytomine-0.1",
     "description": "3D nuclei segmentation using 3D gaussian blur thresholding and 3D watershed using MorpholibJ plugin",
-    "command-line": "python wrapper.py CYTOMINE_HOST CYTOMINE_PUBLIC_KEY CYTOMINE_PRIVATE_KEY CYTOMINE_ID_PROJECT CYTOMINE_ID_SOFTWARE",
+    "command-line": "python wrapper.py CYTOMINE_HOST CYTOMINE_PUBLIC_KEY CYTOMINE_PRIVATE_KEY CYTOMINE_ID_PROJECT CYTOMINE_ID_SOFTWARE IJ_RADIUS IJ_MIN_THRESHOLD",
     "inputs": [
         {
             "id": "cytomine_host",
