@@ -27,52 +27,16 @@ for(i=0; i<images.length; i++) {
 	if (endsWith(image, ".tif")) {
 		// Open image
 		open(inputDir + "/" + image);
+		// Workflow
 		run("Gaussian Blur 3D...", "x="+d2s(gauRad,0)+" y="+d2s(gauRad,0)+" z="+d2s(gauRad,0));
-    setThreshold(d2s(minThreshold,0), 255);
-    run("Convert to Mask", "method=Default background=Dark");
-    run("3D Fill Holes");
-    //ID = getImageID();
-    run("Distance Transform Watershed 3D", "distances=[Borgefors (3,4,5)] output=[16 bits] normalize dynamic=2 connectivity=6");
-    setMinAndMax(0,65535);
-    run("16-bit");
-		/*
-		width = getWidth();
-		height = getHeight();
-		
-		// Processing
-		run("Clear Results", "");
-		run("FeatureJ Laplacian", "compute smoothing="+d2s(LapRad,2));
-		run("Find Maxima...", "noise="+d2s(NoiseTol,2)+" output=List light");
-		
-		// Export results
-		newImage("Mask", "16-bit black", width, height, 1);
-		for(r=0;r<nResults;r++)
-		{
-			XPos = getResult("X",r);
-			YPos = getResult("Y",r);
-			setPixel(XPos,YPos,65535);			
-		}
-		*/
+		setThreshold(d2s(minThreshold,0), 255);
+		run("Convert to Mask", "method=Default background=Dark");
+		run("3D Fill Holes");
+		run("Distance Transform Watershed 3D", "distances=[Borgefors (3,4,5)] output=[16 bits] normalize dynamic=2 connectivity=6");
+		run("Connected Components Labeling", "connectivity=6 type=[16 bits]");
 		save(outputDir + "/" + image);
 		// Cleanup
 		run("Close All");
 	}
 }
 run("Quit");
-
-
-
-
-
-
-
-run("Gaussian Blur 3D...", "x=4 y=4 z=4");
-setThreshold(15, 255);
-run("Convert to Mask", "method=Default background=Dark");
-run("3D Fill Holes");
-ID = getImageID();
-run("Distance Transform Watershed 3D", "distances=[Borgefors (3,4,5)] output=[16 bits] normalize dynamic=2 connectivity=6");
-setMinAndMax(0,65535);
-run("16-bit");
-selectImage(ID);
-close();
