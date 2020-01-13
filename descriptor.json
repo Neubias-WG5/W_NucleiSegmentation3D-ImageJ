@@ -1,5 +1,5 @@
 {
-    "name": "Nuclei_Segmentation_3D_ImageJ",
+    "name": "NucleiSegmentation3D-ImageJ",
     "container-image": {
         "image": "neubiaswg5/w_nucleisegmentation3d-imagej",
         "type": "singularity"
