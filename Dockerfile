@@ -1,4 +1,4 @@
-from 3.6.9-slim-buster
+from 3.7-buster
 
 ENV DEBIAN_FRONTEND=noninteractive
 
