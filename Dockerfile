@@ -53,7 +53,7 @@ RUN rm -r /biaflows-utilities
 # ---------------------------------------------------------------------------------------------------------------------
 # Install Fiji plugins
 RUN cd /fiji/plugins && wget -O MorphoLibJ_-1.3.6.jar https://github.com/ijpb/MorphoLibJ/releases/download/v1.3.6/MorphoLibJ_-1.3.6.jar
-RUN cd /fiji/plugins && wget -O mcib3d-core3.92.jar http://imagejdocu.tudor.lu/lib/exe/fetch.php?media=plugin:stacks:3d_ij_suite:mcib3d-core3.92.jar
+RUN cd /fiji/plugins && wget -O mcib3d-core-4.1.5.jar https://mcib3d.frama.io/3d-suite-imagej/uploads/mcib3d-core-4.1.5.jar
 RUN cd /fiji/plugins && wget -O mcib3d_plugins3.92.jar http://imagejdocu.tudor.lu/lib/exe/fetch.php?media=plugin:stacks:3d_ij_suite:mcib3d_plugins3.92.jar
 
 # ---------------------------------------------------------------------------------------------------------------------
