@@ -1,8 +1,15 @@
-FROM python:3.6.9-slim-stretch
+from 3.6.9-slim-buster
 
-# ---------------------------------------------------------------------------------------------------------------------
-# Install Java
-RUN apt-get update && apt-get install openjdk-8-jdk -y && apt-get clean
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN mkdir -p /usr/share/man/man1 /usr/share/man/man2
+
+RUN apt-get update && \
+apt-get install -y --no-install-recommends \
+        openjdk-11-jre
+
+# Prints installed java version, just for checking
+RUN java --version
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Install Cytomine python client
