@@ -9,7 +9,8 @@ jobs:
 
     steps:
       - name: Set output  
-        run: echo "tag=$(echo ${GITHUB_REF:10})" >> $GITHUB_OUTPUT
+        id: vars
+        run: echo name=tag::$(echo ${GITHUB_REF:10}) >> $GITHUB_OUTPUT
       - name: Show version
         run: echo "tag=${{ steps.vars.outputs.tag }}"
-        shell: bash
+        
