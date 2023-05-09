@@ -12,5 +12,7 @@ jobs:
       - name: Get the version
         id: vars
         run: echo "name=tag::$(echo ${GITHUB_REF:10})" >> $GITHUB_OUTPUT
+        shell: bash
       - name: Show version
-        run: echo ${{ steps.vars.outputs.tag }}
+        run: echo "tag=${{ steps.vars.outputs.tag }}"
+        shell: bash
