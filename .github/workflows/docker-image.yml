@@ -24,7 +24,7 @@ jobs:
       shell: bash  
     - name: Get the version
       id: vars
-      run: echo ::set-output name=tag::$(echo ${GITHUB_REF:10})
+      run: echo "tag=$(echo ${GITHUB_REF:10})" >> $GITHUB_OUTPUT
     - name: Build the tagged Docker image
       run: docker build . --file Dockerfile --tag  ${{ env.USER_NAME }}/${{ env.REPOSITORY_NAME }}:${{ steps.vars.outputs.tag }}
     - name: Push the tagged Docker image
