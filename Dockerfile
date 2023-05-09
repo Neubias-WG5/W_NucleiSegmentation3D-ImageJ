@@ -2,7 +2,7 @@ FROM python:3.6.9-buster
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Install Java
-RUN apt-get update && apt-get install openjdk-8-jdk -y && apt-get clean
+RUN apt-add-repository 'deb http://security.debian.org/debian-security stretch/updates main' && apt-get update && apt-get install openjdk-8-jdk -y && apt-get clean
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Install Cytomine python client
